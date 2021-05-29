@@ -10,13 +10,20 @@ const cors = require('cors');
 app.use(cors());
 app.use(morgan('tiny'));
 const mongoose = require('mongoose');
-
+const authJwt = require('./helper/jwt');
+app.use(authJwt());
+app.use('public/uploads',express.static(__dirname+'/public/uploads'))
+app.use((err, req, res, next) => {
+    if (err) {
+        res.status(500).send({ message: "authentication failed"})
+    }
+})
 const api = process.env.API_URL;
 var port = 2100;
 const productsRoutes = require('./routes/product');
 const categoryRoutes = require('./routes/category');
 const ordersRoutes = require('./routes/order');
-const userRoutes = require('./routes/order');
+const userRoutes = require('./routes/user');
 
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/categories`, categoryRoutes);
@@ -24,7 +31,7 @@ app.use(`${api}/orders`, ordersRoutes);
 app.use(`${api}/users`, userRoutes);
 
 
-app.get('',(req,res)=>{
+app.get('', (req, res) => {
     console.log("he;;p")
     res.send('hello world')
 })
